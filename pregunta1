@@ -1,0 +1,15 @@
+-- Crear un procedimiento almacenado o función que retorne los nombres de los asesores con la mayor cantidad de alumnos asignados.
+
+create view v_students_quantity_per_adviser
+as
+select a.first_name first_name, a.last_name last_name, count(s.id) quantity
+from advisers a
+	join students s on a.id = s.adviser_id
+group by a.first_name, a.last_name
+go
+
+create function f_adviser_with_max_students_quantity() returns table
+return
+	select first_name, last_name
+	from v_students_quantity_per_adviser
+	where quantity = (select max(quantity) from v_students_quantity_per_adviser)
