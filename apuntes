@@ -1,0 +1,22 @@
+Pregunta 1 (2 p.). Crear un procedimiento almacenado o función que retorne los nombres de los asesores con la mayor cantidad de alumnos asignados.
+CREATE FUNCTION ola()
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT A.nombres, A.apellidos, COUNT(E.id) as cantidad_alumnos
+    FROM asesor A INNER JOIN estudiantes E 
+	ON A.id = E.asesor_id
+    GROUP BY A.id, A.nombres, A.apellidos
+    HAVING COUNT(E.id) = (
+        SELECT MAX(cantidad_alumnos)
+        FROM (
+            SELECT COUNT(*) as cantidad_alumnos
+            FROM estudiantes
+            GROUP BY asesor_id
+        ) AS conteo_alumnos
+    )
+);
+-- Utilizar la función en una consulta SELECT
+SELECT nombres, apellidos, cantidad_alumnos
+FROM dbo.ola();
